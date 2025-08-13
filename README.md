@@ -1,3 +1,5 @@
+#Pendiente. Edicion de readme
+
 # 🌐 Documentacion del proyecto 
 
 > Desarrollo de una interfaz web interactiva para enseñar conceptos de telecomunicaciones e IoT
