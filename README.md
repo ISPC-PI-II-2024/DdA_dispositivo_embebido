@@ -1,38 +1,72 @@
-# Pendiente. Edicion de readme
+# 🌾 Sistema Embebido para Monitoreo de Silos – Proyecto Intertecnicatura
 
-# 🌐 Documentacion del proyecto 
+## 🎯 Propósito
 
-> Desarrollo de una interfaz web interactiva para enseñar conceptos de telecomunicaciones e IoT
+Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribuido para el **monitoreo ambiental de silos metálicos verticales**, en el marco de una **demostración educativa interdisciplinaria** entre las tecnicaturas de:
 
-## 🎯 Objetivo
-Diseñar y desarrollar un frontend educativo que permita a estudiantes visualizar datos en tiempo real, simular redes IoT y comprender protocolos de telecomunicaciones.
+- Telecomunicaciones  
+- Desarrollo de Software  
+- Tecnologías Aplicadas al Agro
+
+---
+
 
 ## 👥 Equipo
 | Nombre                        | GitHub                                 |
 |------------------------------|----------------------------------------|
 | Leandro Roldan               | [@pleroldan](https://github.com/pleroldan) |
 
+## 🧱 Arquitectura del sistema
 
+| Rol del dispositivo | Componentes | Función principal |
+|---------------------|-------------|-------------------|
+| **Endpoint**        | ESP32 + LoRa + múltiples sensores AHT10 + RS485 | Captura de temperatura y humedad desde múltiples sensores. RS485 permite extender la distancia entre sensores y el microcontrolador. |
+| **Gateway**         | ESP32 + LoRa + GSM + Pantalla LCD 40x2 I2C       | Recibe datos vía LoRa, los transmite en tiempo real vía MQTT a un broker en servidor dedicado. La pantalla está disponible para mostrar información como señal, batería y cantidad de endpoints conectados. |
+
+---
+
+## 📡 Comunicación
+
+- **Entre nodos**: LoRa (Gateway ↔ Endpoint)  
+- **Transmisión remota**: MQTT sobre GSM (Gateway → Broker dedicado)  
+- **Sensores**: AHT10 (temperatura y humedad)  
+- **Extensión de sensores**: RS485 para mayor alcance físico  
+
+---
 
 ## 📂 Estructura del repositorio
 | Carpeta | Contenido |
 |--------|---------|
 | `a_requisitos/` | Definición del problema, objetivos y funcionalidades |
 | `b_investigacion/` | Fundamentos técnicos, protocolos y arquitectura |
-| `c_prototipo/` | Código del frontend, pruebas y evidencias |
+| `c_prototipo/` | Código fuente del nodo y gateway  |
 | `d_presentacion/` | Presentación final, guion y reflexión |
 | `assets/` | Imágenes, diagramas y recursos multimedia |
 
-## ⚙️ Tecnologías utilizadas
-- Frontend: React.js / Vue.js (COMPLETAR CON FRAMEWORK CORRECTO)
-- Visualización: Chart.js o D3.js (COMPLETAR CON FRAMEWORK CORRECTO)
-- Comunicación: WiFi, MQTT sobre WebSockets o REST API
-- Estilos: Tailwind CSS o Bootstrap
-- Hosting: A DEFINIR
+## 🛠️ Tecnologías utilizadas
 
-## 📚 Resultados esperados
-- Interfaz web interactiva para monitoreo de sensores IoT.
-- Documentación completa del proceso ABP.
+- Microcontroladores: ESP32  
+- Sensores: AHT10  
+- Pantalla: LCD 40x2 con interfaz I2C  
+- Comunicación: LoRa, RS485, GSM  
+- Protocolo de transmisión: MQTT  
+- Entorno de desarrollo: Visual Studio Code + PlatformIO  
+
+---
+
+
+---
+
+## 📊 Estado del proyecto
+
+- [x] Definición de arquitectura  
+- [ ] Programación de firmware  
+- [ ] Comunicación LoRa entre nodos  
+- [ ] Visualización en pantalla  
+- [ ] Transmisión MQTT al broker  
+- [ ] Validación en entorno de silo  
+
+---
 
 ## 📎 Enlaces útiles
 - [Definir los enlaces a la informacion correcta (Solicitado por el profesor para mejor legibilidad)] (pendiente)
