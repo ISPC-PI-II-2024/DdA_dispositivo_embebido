@@ -15,6 +15,9 @@ Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribui
 | Nombre                        | GitHub                                 |
 |------------------------------|----------------------------------------|
 | Leandro Roldan               | [@pleroldan](https://github.com/pleroldan) |
+| Gaston Osess               | [@cholobackcod](https://github.com/cholobackcod) |
+| Raul Jara              | [@r-j28](https://github.com/r-j28) |
+| Lautaro Villafañe               | [@lautiiv](https://github.com/lautiiv) |
 
 ## 🧱 Arquitectura del sistema
 
