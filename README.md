@@ -23,17 +23,18 @@ Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribui
 
 | Rol del dispositivo | Componentes | Función principal |
 |---------------------|-------------|-------------------|
-| **Endpoint**        | ESP32 + LoRa + múltiples sensores AHT10 + RS485 | Captura de temperatura y humedad desde múltiples sensores. RS485 permite extender la distancia entre sensores y el microcontrolador. |
 | **Gateway**         | ESP32 + LoRa + GSM + Pantalla LCD 40x2 I2C       | Recibe datos vía LoRa, los transmite en tiempo real vía MQTT a un broker en servidor dedicado. La pantalla está disponible para mostrar información como señal, batería y cantidad de endpoints conectados. |
 
+| **Endpoint**        | ESP32 + LoRa + RS485 | Recolección de datos en los distintos sensores,  RS485 permite intenconectar multiples dispositivos hacia el endpoint. |
+|** Micro dedicado, conectado al sensor ** | ESP8266 + sensor AHT10 + RS485 |
 ---
 
 ## 📡 Comunicación
-
-- **Entre nodos**: LoRa (Gateway ↔ Endpoint)  
 - **Transmisión remota**: MQTT sobre GSM (Gateway → Broker dedicado)  
-- **Sensores**: AHT10 (temperatura y humedad)  
-- **Extensión de sensores**: RS485 para mayor alcance físico  
+- **Entre nodos**: LoRa (Gateway ↔ Endpoint)  
+
+- **Sensores**: AHT10 (temperatura y humedad)  i2c
+- **Extensión de sensores**: RS485 para mayor alcance físico  entre endpoint y micro dedicado
 
 ---
 
@@ -42,16 +43,16 @@ Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribui
 |--------|---------|
 | `a_requisitos/` | Definición del problema, objetivos y funcionalidades |
 | `b_investigacion/` | Fundamentos técnicos, protocolos y arquitectura |
-| `c_prototipo/` | Código fuente del nodo y gateway  |
+| `c_prototipo/` | Códigos fuentes del nodo, gateway y sensores |
 | `d_presentacion/` | Presentación final, guion y reflexión |
 | `assets/` | Imágenes, diagramas y recursos multimedia |
 
 ## 🛠️ Tecnologías utilizadas
 
-- Microcontroladores: ESP32  
+- Microcontroladores: ESP32  ESP8266
 - Sensores: AHT10  
 - Pantalla: LCD 40x2 con interfaz I2C  
-- Comunicación: LoRa, RS485, GSM  
+- Comunicación: LoRa, RS485, GSM, I2C
 - Protocolo de transmisión: MQTT  
 - Entorno de desarrollo: Visual Studio Code + PlatformIO  
 
@@ -64,7 +65,7 @@ Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribui
 
 - [x] Definición de arquitectura  
 - [ ] Programación de firmware  
-- [ ] Comunicación LoRa entre nodos  
+- [x] Comunicación LoRa entre nodos  
 - [ ] Visualización en pantalla  
 - [ ] Transmisión MQTT al broker  
 - [ ] Validación en entorno de silo  
