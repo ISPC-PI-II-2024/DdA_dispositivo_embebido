@@ -24,9 +24,8 @@ Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribui
 | Rol del dispositivo | Componentes | Función principal |
 |---------------------|-------------|-------------------|
 | **Gateway**         | ESP32 + LoRa + GSM + Pantalla LCD 40x2 I2C       | Recibe datos vía LoRa, los transmite en tiempo real vía MQTT a un broker en servidor dedicado. La pantalla está disponible para mostrar información como señal, batería y cantidad de endpoints conectados. |
-
 | **Endpoint**        | ESP32 + LoRa + RS485 | Recolección de datos en los distintos sensores,  RS485 permite intenconectar multiples dispositivos hacia el endpoint. |
-|** Micro dedicado, conectado al sensor ** | ESP8266 + sensor AHT10 + RS485 |
+|** Micro dedicado, conectado al sensor ** | ESP8266 + sensor AHT10 + RS485 | Sensorizacion del entorno fisico (Se utiliza un mcu para lograr colocar el sensor alejado del endpoint) |
 ---
 
 ## 📡 Comunicación
