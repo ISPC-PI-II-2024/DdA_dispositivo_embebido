@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"name": "micro_sensores",
+			"path": "."
+		}
+	],
+	"settings": {}
+}

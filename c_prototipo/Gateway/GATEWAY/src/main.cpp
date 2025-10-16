@@ -4,8 +4,7 @@
 #include <SPI.h>
 #include <LoRa.h>
 
-// ⚠️ Asegúrate de usar la dirección I2C correcta (0x27 o 0x3F)
-LiquidCrystal_I2C lcd(0x27, 20, 4);  // ← AJUSTA SEGÚN TU ESCÁNER
+LiquidCrystal_I2C lcd(0x27, 20, 4);  // ← AJUSTAR SEGÚN ESCÁNER
 
 #define LORA_SCK 18
 #define LORA_MISO 19
