@@ -4,13 +4,17 @@ Sistema de gateway MQTT sobre WebSocket para ESP32, con configuración WiFi medi
 
 ## 📋 Características
 
-- ✅ Conexión MQTT sobre WebSocket (puerto 80)
+
 - ✅ Portal web de configuración WiFi (modo Access Point)
 - ✅ Pantalla LCD I2C para visualización de estado
 - ✅ Reconexión automática WiFi y MQTT
 - ✅ Publicación periódica de estado del gateway
 - ✅ Sincronización horaria con NTP (zona horaria Argentina)
 
+### Pendiente:
+ - -  Conexión MQTT sobre WebSocket (puerto 80)
+  
+   
 ## 🔧 Hardware Requerido
 
 - **ESP32 DOIT DevKit V1** (o compatible)
@@ -289,17 +293,8 @@ Las contribuciones son bienvenidas. Por favor:
 4. Push a la rama (`git push origin feature/NuevaFuncionalidad`)
 5. Abrir Pull Request
 
-## 📧 Contacto
 
-[Tu información de contacto]
-
-## 🙏 Agradecimientos
-
-- Biblioteca WebSockets de Links2004
-- Biblioteca PubSubClient de knolleary
-- Biblioteca LiquidCrystal_I2C de marcoschwartz
-- Comunidad de PlatformIO y ESP32
 
 ---
 
-**Nota:** Este proyecto fue desarrollado para el curso/proyecto de IoT con MQTT.
+**Nota:** Este proyecto fue desarrollado para el curso/ desarrollo de aplicaciones iot en el marco del espacio intertecnicatura de ISPC
