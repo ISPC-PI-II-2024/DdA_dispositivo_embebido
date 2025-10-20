@@ -3,12 +3,23 @@
 #define LCDPLUS_H
 
 #include <Arduino.h>
-
-// Forward declaration
-class LiquidCrystal_I2C;
+#include <LiquidCrystal_I2C.h>
 
 void initLCD();
 void actualizarLCD();
 LiquidCrystal_I2C& getLCD();
+void mostrarMensajeLCD(const String& linea1, const String& linea2, unsigned long duracion = 0);
+void volverModoNormal();
+
+enum class LCDMode {
+  NORMAL,
+  RESET_PROMPT,
+  RESET_PROGRESS,
+  RESET_CONFIRM,
+  RESET_CANCEL
+};
+
+extern LCDMode lcdMode;
+extern unsigned long lcdModeUntil;
 
 #endif

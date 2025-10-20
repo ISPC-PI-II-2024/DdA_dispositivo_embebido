@@ -6,10 +6,7 @@
 #include <WiFi.h>
 #include <Preferences.h>
 #include <WebSocketsClient.h>
-#include <PubSubClient.h>
-
-// Forward declaration
-class WebSocketClient;
+#include "mqtt_manual.h"
 
 // Variables globales exportadas
 extern String ssid;
@@ -19,11 +16,12 @@ extern bool apMode;
 extern bool mqttConnected;
 extern Preferences preferences;
 extern WebSocketsClient webSocket;
-extern WebSocketClient* wsClient;
-extern PubSubClient mqttClient;
+extern MQTTManual* mqttClient;
 
 // Constantes
 extern const char* gatewayId;
+
+extern const int RESET_BUTTON_PIN;  // Cambiar a GPIO 33 en conexiones.cpp
 
 // Funciones
 void initWiFi();
@@ -31,8 +29,10 @@ void conectarWifi();
 void iniciarAP();
 void handleWiFiReconnect();
 void initMQTT();
+void mqttLoop();
 void publishStatus();
-void reconnectMQTT();
+void clearWiFiConfig();
+void checkResetButton();
 String obtenerHoraArgentina();
 String calidadSenalWifi(int rssi);
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length);
