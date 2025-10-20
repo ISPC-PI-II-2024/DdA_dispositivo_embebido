@@ -16,7 +16,7 @@ Sistema de gateway MQTT sobre WebSocket para ESP32, con configuración WiFi medi
 ## 🔧 Hardware Requerido
 
 - **ESP32 DOIT DevKit V1** (o compatible)
-- **Pantalla LCD I2C 16x2** (dirección 0x27 o 0x3F)
+- **Pantalla LCD I2C 40x4** (dirección 0x27 o 0x3F)
 - **Botón pulsador** (Normally Open)
 - Cable USB para programación
 - Fuente de alimentación 5V
@@ -498,9 +498,6 @@ Este proyecto sirve como prueba unitaria de los siguientes componentes:
 - Sobrevive a reinicios y cortes de energía
 - Se puede borrar con el botón de reset o reprogramación
 
-## 📄 Licencia
-
-[Especificar tu licencia aquí - Ejemplo: MIT, GPL, Apache, etc.]
 
 ## 👥 Contribuciones
 
@@ -518,17 +515,15 @@ Las contribuciones son bienvenidas. Por favor:
 - Probar en hardware real antes de PR
 - Actualizar README si es necesario
 
-## 🙏 Agradecimientos
-
+## 🙏 Agradecimientos  
+- Profesorado ISPC
 - Biblioteca **WebSockets** de [Links2004](https://github.com/Links2004/arduinoWebSockets)
 - Biblioteca **LiquidCrystal_I2C** de [marcoschwartz](https://github.com/marcoschwartz/LiquidCrystal_I2C)
 - Biblioteca **ArduinoJson** de [bblanchon](https://github.com/bblanchon/ArduinoJson)
 - Comunidad de PlatformIO y ESP32
 - Documentación de MQTT Protocol v3.1.1
 
-## 📧 Contacto
 
-[Tu información de contacto - Ejemplo: email, GitHub, Discord, etc.]
 
 ---
 
@@ -540,4 +535,4 @@ Las contribuciones son bienvenidas. Por favor:
 
 ---
 
-**Nota:** Este proyecto fue desarrollado como prueba unitaria para sistemas IoT con MQTT sobre WebSocket.
+**Nota:** Este proyecto fue desarrollado como prueba unitaria para sistemas IoT con MQTT sobre WebSocket, Para la instancia intertecnicatura del ISPC en conjunto de TS-telecomunicaciones y TS-Desarrollo de software
