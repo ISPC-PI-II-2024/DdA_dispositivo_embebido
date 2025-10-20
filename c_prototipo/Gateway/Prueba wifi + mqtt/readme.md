@@ -533,7 +533,7 @@ Las contribuciones son bienvenidas. Por favor:
 ---
 
 **Proyecto:** Gateway MQTT ESP32 - Prueba Unitaria  
-**Versión:** 1.0.0  
+**Versión:** 2 
 **Última actualización:** Octubre 2025  
 **Plataforma:** ESP32 (espressif32)  
 **Framework:** Arduino
