@@ -66,7 +66,7 @@ Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribui
 - [ ] Programación de firmware  
 - [x] Comunicación LoRa entre nodos  
 - [ ] Visualización en pantalla  
-- [ ] Transmisión MQTT al broker  
+- [x] Transmisión MQTT al broker  
 - [ ] Validación en entorno de silo  
 
 ---
