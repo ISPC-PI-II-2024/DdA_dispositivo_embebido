@@ -1,0 +1,30 @@
+Estructura del proyecto
+                        (-Cloud)  
+                       ☁️ MQTT Broker  
+                             ↑
+                             | WebSocket  
+                             |  
+                    ┌────────┴────────┐  
+                    │   GATEWAY ESP32  │  
+                    │  - WiFi          │  
+                    │  - MQTT Client   │  
+                    │  - LCD 40x4      │  
+                    │  - LoRa RX       │  
+                    └────────┬────────┘  
+                             | LoRa 433MHz  
+                             ↓  
+                    ┌────────────────┐  
+                    │ ENDPOINT ESP32-C3│  
+                    │  - LoRa TX/RX    │
+                    │  - RS485 Master  │
+                    │  - 3 LEDs        │  
+                    └────────┬────────┘  
+                             | RS485  
+                             ↓  
+         ┌───────────────────┼───────────────────┐  
+         ↓                   ↓                   ↓  
+    ┌─────────┐        ┌─────────┐        ┌─────────┐  
+    │ESP8266-1│        │ESP8266-2│   ...  │ESP8266-5│  
+    │+ AHT10-1│        │+ AHT10-2│        │+ AHT10-5│    
+    └─────────┘        └─────────┘        └─────────┘  
+   Sensor ID: 1       Sensor ID: 2       Sensor ID: 5  
