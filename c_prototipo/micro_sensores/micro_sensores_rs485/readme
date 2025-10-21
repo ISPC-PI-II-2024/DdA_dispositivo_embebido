@@ -1,0 +1,207 @@
+📡 Micro-sensores RS485 - ESP8266 + AHT10
+📋 Descripción del Proyecto
+Sistema de monitoreo de sensores ambientales usando ESP8266 como dispositivo esclavo RS485. Cada módulo lee temperatura y humedad del sensor AHT10 y responde a comandos via protocolo RS485 personalizado.
+
+🏗️ Arquitectura del Sistema
+
+[ESP8266 + AHT10] → (RS485) → [ESP32-C3 Endpoint] → (LoRa) → [Gateway] → (MQTT/WebSockets) → [Backend]
+
+⚙️ Configuración Técnica
+📌 Hardware Requerido
+Microcontrolador: ESP8266 (NodeMCU v2)
+
+Sensor: AHT10 (Temperatura y Humedad)
+
+Comunicación: Módulo MAX485 para RS485
+
+Alimentación: 3.3V
+
+🔌 Diagrama de Conexiones
+AHT10 (Sensor)
+Pin AHT10	Pin ESP8266
+VCC	3.3V
+GND	GND
+SDA	GPIO4 (D2)
+SCL	GPIO5 (D1)
+MAX485 (RS485)
+Pin MAX485	Pin ESP8266
+RO	GPIO13 (D7)
+DI	GPIO12 (D6)
+DE/RE	GPIO14 (D5)
+VCC	3.3V
+GND	GND
+🚀 Instalación y Configuración
+1. Requisitos Previos
+PlatformIO IDE (VS Code)
+
+Librería Adafruit AHTX0
+
+
+2. Configuración PlatformIO
+
+[env:nodemcuv2]
+platform = espressif8266
+board = nodemcuv2
+framework = arduino
+monitor_speed = 115200
+upload_speed = 921600
+
+lib_deps =
+    adafruit/Adafruit AHTX0
+
+build_flags =
+    -Wl,-Teagle.flash.4m3m.ld
+    -D PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM48_SECHEAP_SHARED
+
+
+    3. Configuración del Dispositivo
+
+    // 🔧 CONFIGURAR POR CADA DISPOSITIVO
+#define MY_ADDRESS 0x01              // Dirección única (1-32)
+#define DEVICE_TYPE "AHT10_SENSOR"   // Tipo de dispositivo  
+#define DEVICE_LOCATION "Silo_Norte" // Ubicación física
+
+
+// 🔧 CONFIGURAR POR CADA DISPOSITIVO
+#define MY_ADDRESS 0x01              // Dirección única (1-32)
+#define DEVICE_TYPE "AHT10_SENSOR"   // Tipo de dispositivo  
+#define DEVICE_LOCATION "Silo_Norte" // Ubicación física
+
+ADDR:[DIRECCIÓN]|CMD:[COMANDO]|[DATOS]|CRC:[CHECKSUM]
+
+Comandos Disponibles
+🎯 DISCOVERY - Identificación
+Request:
+ADDR:BROADCAST|CMD:DISCOVERY|CRC:XXXX
+
+Response:
+ADDR:01|CMD:DISCOVERY_RESP|TYPE:AHT10_SENSOR|LOC:Silo_Norte|STATUS:READY|TEMP:25.5|HUM:60.2|CRC:ABCD
+
+🌡️ READ_SENSOR - Lectura
+Request:
+ADDR:01|CMD:READ_SENSOR|CRC:XXXX
+
+Response:
+ADDR:01|CMD:SENSOR_DATA|TEMP:25.5|HUM:60.2|UNIT_TEMP:C|UNIT_HUM:%|TIMESTAMP:123456789|CRC:ABCD
+
+📊 STATUS - Estado
+Request:
+ADDR:01|CMD:STATUS|CRC:XXXX
+
+Response:
+ADDR:01|CMD:STATUS_RESP|SENSOR_ACTIVE:YES|LAST_READ:123456|UPTIME:3600s|RSSI:-45dBm|CRC:ABCD
+
+⚙️ CONFIG - Configuración
+Request:
+ADDR:01|CMD:CONFIG|PARAM:VALUE|CRC:XXXX
+
+Response:
+ADDR:01|CMD:CONFIG_ACK|STATUS:OK|CRC:ABCD
+
+🔄 Comportamiento del Sistema
+Ciclo de Operación
+Inicialización: Verifica sensor y configura RS485
+
+Escucha Continua: Espera comandos del maestro RS485
+
+Heartbeat Automático: Envía estado cada 30 segundos
+
+Lectura Local: Monitorea sensor cada 5 segundos (solo para debug)
+
+Estados del Dispositivo
+BOOTING: Inicialización del sistema
+
+READY: Sensor activo y funcionando
+
+SENSOR_ERROR: Fallo en la lectura del sensor
+
+COMM_ERROR: Problemas de comunicación
+
+🛠️ Funciones Principales
+procesarComando(String comando)
+Analiza y ejecuta comandos recibidos
+
+Valida dirección del dispositivo
+
+Genera respuestas estructuradas
+
+enviarRS485(String mensaje)
+Controla pines DE/RE del MAX485
+
+Agrega checksum CRC automáticamente
+
+Maneja temporización de transmisión
+
+leerSensor()
+Lee temperatura y humedad del AHT10
+
+Maneja errores de comunicación I2C
+
+Actualiza variables globales
+
+🐛 Solución de Problemas
+Error de Compilación
+Si hay errores con la librería AHTX0, usar:
+
+lib_deps = adafruit/Adafruit AHTX0 @ ^1.1.2
+
+Sensor No Detectado
+Verificar conexiones I2C (SDA/SCL)
+
+Confirmar alimentación 3.3V
+
+Revisar direcciones I2C con scanner
+
+Comunicación RS485
+Verificar pines RO/DI/DE-RE
+
+Confirmar velocidad 9600 bauds
+
+Revisar terminación de bus y tierra
+
+📊 Monitoreo y Debug
+Salida Serial
+El dispositivo envía información detallada por Serial (115200 bauds):
+
+Estado de inicialización
+
+Comandos recibidos/enviados
+
+Lecturas de sensores
+
+Heartbeats automáticos
+
+LEDs de Estado (Opcional)
+Se pueden agregar LEDs para indicar:
+
+Verde: Sensor activo
+
+Amarillo: Transmisión RS485
+
+Rojo: Error/Reconexión
+
+🔄 Próximos Pasos
+Implementar Endpoint ESP32-C3 (Maestro RS485)
+
+Configurar comunicación LoRa al Gateway
+
+Desarrollar protocolo MQTT/WebSockets para backend
+
+Implementar sistema de configuración remota
+
+📝 Notas Importantes
+Cada dispositivo debe tener dirección única (0x01-0x20)
+
+El bus RS485 requiere terminación en ambos extremos
+
+Considerar distancia máxima del bus RS485 (1200m teóricos)
+
+Implementar timeout en comunicaciones para robustez
+
+👥 Contribución
+Este proyecto es parte del sistema de monitoreo de silos desarrollado para la Tecnicatura en Telecomunicaciones.
+
+🔄 Estado del Proyecto: ✅ Compilado y Funcional
+
+
+
