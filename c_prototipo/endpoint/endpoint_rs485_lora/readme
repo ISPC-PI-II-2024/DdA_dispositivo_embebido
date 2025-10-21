@@ -1,0 +1,358 @@
+🌡️ Endpoint ESP32-C3 - Sistema RS485 a LoRa
+<div align="center">
+https://img.shields.io/badge/ESP32--C3-RISC--V-red?style=for-the-badge&logo=espressif
+https://img.shields.io/badge/Protocolo-RS485-blue?style=for-the-badge
+https://img.shields.io/badge/Comunicaci%C3%B3n-LoRa-green?style=for-the-badge
+https://img.shields.io/badge/PlatformIO-IDE-orange?style=for-the-badge&logo=visualstudiocode
+
+Sistema maestro de recolección y transmisión de datos ambientales
+
+</div>
+📋 Tabla de Contenidos
+🎯 Descripción
+
+🏗️ Arquitectura
+
+🔧 Características
+
+⚡ Instalación Rápida
+
+🔌 Conexiones
+
+📡 Protocolo
+
+🔄 Funcionamiento
+
+🚀 Uso
+
+🐛 Solución de Problemas
+
+🔧 Desarrollo
+
+🎯 Descripción
+El Endpoint ESP32-C3 actúa como el cerebro central del sistema de monitoreo, recolectando datos de múltiples sensores ESP8266 via RS485 y transmitiéndolos de forma inalámbrica via LoRa a un Gateway central.
+
+💡 Analogía Simple
+
+🔄 CICLO AUTOMÁTICO (2 minutos):
+
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│ 🔍 │ │ 🌡️ │ │ 📡 │ │ 💤 │
+│ DISCOVERY │───▶│ LECTURA │───▶│ TRANSMISIÓN │───▶│ ESPERA │
+│ 10 seg │ │ 30 seg │ │ 15 seg │ │ 65 seg │
+└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+▲ │
+└───────────────────────────────────────────────┘
+
+🏗️ Arquitectura
+Diagrama del Sistema
+text
+┌─────────────────┐    RS485    ┌─────────────────┐    LoRa     ┌─────────────────┐
+│   ESP8266       │◄───────────►│   ESP32-C3      │◄───────────►│   Gateway       │
+│  + AHT10        │             │   Endpoint      │             │   ESP32         │
+│  (Sensor 01)    │             │                 │             │                 │
+└─────────────────┘             └─────────────────┘             └─────────────────┘
+         │                               │                               │
+┌─────────────────┐                      │                               │
+│   ESP8266       │                      │                               │
+│  + AHT10        │                      │                               │
+│  (Sensor 02)    │                      │                               │
+└─────────────────┘                      │                               │
+                                         ▼                               ▼
+                                ┌─────────────────┐             ┌─────────────────┐
+                                │   MAX485        │             │   SX1278        │
+                                │   (RS485)       │             │   (LoRa)        │
+                                └─────────────────┘             └─────────────────┘
+🔧 Características
+✅ Funcionalidades Principales
+🔄 Ciclo Automático cada 2 minutos (configurable)
+
+🔍 Auto-descubrimiento de sensores conectados
+
+📊 Recolección Centralizada de datos ambientales
+
+📡 Transmisión LoRa de largo alcance
+
+🔒 Protocolo Robustecido con estructura de datos
+
+🎯 Especificaciones Técnicas
+Parámetro	Especificación
+Microcontrolador	ESP32-C3 (RISC-V)
+Comunicación Local	RS485 (hasta 32 dispositivos)
+Comunicación Remota	LoRa 433MHz (SF7, BW125)
+Alimentación	3.3V DC
+Consumo	~120mA en operación
+⚡ Instalación Rápida
+Prerrequisitos
+PlatformIO IDE (extensión VS Code)
+
+ESP32-C3-DevKitM-1
+
+Módulo MAX485 (RS485)
+
+Módulo SX1278 (LoRa)
+
+1. Clonar y Configurar
+# Crear proyecto en PlatformIO
+Project Name: endpoint_rs485_lora
+Board: Espressif ESP32-C3-DevKitM-1
+Framework: Arduino
+
+2. Configurar platformio.ini
+[env:esp32-c3-devkitm-1]
+platform = espressif32
+board = esp32-c3-devkitm-1
+framework = arduino
+monitor_speed = 115200
+
+lib_deps = 
+    sandeepmistry/LoRa
+    bblanchon/ArduinoJson
+
+    3. Implementar Código
+Copiar el contenido de src/main.cpp con el código proporcionado.
+
+🔌 Conexiones
+Diagrama de Pines ESP32-C3
+
+       ┌──────────────┐
+       │  ESP32-C3    │
+       │  DevKitM-1   │
+ 3V3 ──┤ ◯         ◯  │── 5V
+  IO4 ──┤ ◯  RO    ◯  │── IO5  ── DI
+  IO6 ──┤ ◯ DE/RE  ◯  │── IO7  ── CS
+  IO8 ──┤ ◯  RST   ◯  │── IO9  ── DIO0
+  IO2 ──┤ ◯  SCK   ◯  │── IO3  ── MISO
+  GND ──┤ ◯         ◯  │── RST
+       │              │
+       └──────────────┘
+
+       Tabla de Conexiones Detallada
+
+🔗 Conexiones RS485 (MAX485)
+Módulo MAX485	ESP32-C3	Función	Color Recomendado
+RO	GPIO4	Recepción	Amarillo
+DI	GPIO5	Transmisión	Verde
+DE/RE	GPIO6	Control	Azul
+VCC	3.3V	Alimentación	Rojo
+GND	GND	Tierra	Negro
+
+📡 Conexiones LoRa (SX1278)
+Módulo LoRa	ESP32-C3	Función	Protocolo
+SCK	GPIO2	Clock SPI	SPI
+MISO	GPIO3	Master In Slave Out	SPI
+MOSI	GPIO4	Master Out Slave In	SPI
+CS	GPIO7	Chip Select	SPI
+RST	GPIO8	Reset	Digital
+DIO0	GPIO9	Interrupción	Digital
+
+📡 Protocolo de Comunicación
+Estructura de Mensajes RS485
+
+🔍 Comando DISCOVERY (Descubrimiento)
+Endpoint → Sensores:
+ADDR:BROADCAST|CMD:DISCOVERY
+
+Sensor → Endpoint:
+ADDR:01|CMD:DISCOVERY_RESP|TYPE:AHT10_SENSOR|LOC:Silo_Norte|STATUS:READY|TEMP:25.5|HUM:60.2
+
+🌡️ Comando READ_SENSOR (Lectura)
+Endpoint → Sensor:
+ADDR:01|CMD:READ_SENSOR
+
+Sensor → Endpoint:
+ADDR:01|CMD:SENSOR_DATA|TEMP:25.5|HUM:60.2|UNIT_TEMP:C|UNIT_HUM:%|TIMESTAMP:123456789
+
+Estructura JSON LoRa
+{
+  "endpoint_id": "EP01",
+  "timestamp": 123456789,
+  "dispositivos_activos": 3,
+  "total_sensores": 3,
+  "sensores": [
+    {
+      "address": "01",
+      "type": "AHT10_SENSOR",
+      "location": "Silo_Norte",
+      "temperature": 25.5,
+      "humidity": 60.2,
+      "status": "ACTIVE",
+      "last_update": 123456789
+    }
+  ]
+}
+
+🔄 Funcionamiento
+⏰ Ciclo Automático (2 minutos)
+
+🔄 CICLO AUTOMÁTICO (2 minutos):
+
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│ 🔍 │ │ 🌡️ │ │ 📡 │ │ 💤 │
+│ DISCOVERY │───▶│ LECTURA │───▶│ TRANSMISIÓN │───▶│ ESPERA │
+│ 10 seg │ │ 30 seg │ │ 15 seg │ │ 65 seg │
+└─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+▲ │
+└───────────────────────────────────────────────┘
+
+Fase 1: 🔍 Discovery (10 segundos)
+Broadcast a todos los dispositivos
+
+Registro de sensores activos
+
+Actualización de lista de dispositivos
+
+Fase 2: 🌡️ Lectura (30 segundos)
+Consulta individual a cada sensor
+
+Recolección de temperatura y humedad
+
+Validación de datos recibidos
+
+Fase 3: 📡 Transmisión (15 segundos)
+Estructuración de datos en JSON
+
+Transmisión via LoRa al Gateway
+
+Confirmación de envío exitoso
+
+Fase 4: 💤 Espera (65 segundos)
+Procesamiento de comandos entrantes
+
+Preparación para próximo ciclo
+
+Monitoreo de estado del sistema
+
+🚀 Uso
+Inicialización del Sistema
+
+void setup() {
+  // 1. Inicializar comunicación serial
+  // 2. Configurar pines RS485
+  // 3. Inicializar módulo LoRa
+  // 4. Iniciar ciclo automático
+}
+
+Monitorización en Tiempo Real
+
+pio device monitor
+
+Salida Esperada:
+🚀 ENDPOINT ESP32-C3 - INICIANDO
+📍 ID: EP01 | 📡 Modo: RS485 Maestro → LoRa
+✅ RS485 INICIALIZADO | ✅ LoRa CONFIGURADO
+
+🔍 INICIANDO DESCUBRIMIENTO...
+📤 RS485 >>> ADDR:BROADCAST|CMD:DISCOVERY
+📥 RS485 <<< ADDR:01|CMD:DISCOVERY_RESP...
+🔍 Sensor descubierto: 01 - Silo_Norte
+
+🌡️ INICIANDO LECTURA...
+📖 Leyendo sensor: 01 - Silo_Norte
+📥 RS485 <<< ADDR:01|CMD:SENSOR_DATA...
+🌡️ Datos actualizados: 01 - Temp: 25.5°C, Hum: 60.2%
+
+📡 ENVIANDO POR LoRa...
+✅ Datos enviados - Sensores: 1
+💤 CICLO COMPLETADO - Esperando próximo ciclo...
+
+Comandos de Depuración
+En el Monitor Serial, puedes enviar:
+TEST:DISCOVERY    # Forzar descubrimiento
+TEST:READ_ALL     # Forzar lectura de sensores
+TEST:STATUS       # Estado del sistema
+
+🐛 Solución de Problemas
+Error: No Detecta Sensores
+Síntomas:
+
+Mensaje "✅ Descubrimiento completado - Dispositivos: 0"
+
+Sin respuestas RS485 en el monitor
+
+Solución:
+
+Verificar alimentación de módulo MAX485 (3.3V)
+
+Confirmar conexiones RO/DI/DE-RE
+
+Probar con un solo sensor primero
+
+Verificar terminación de bus RS485
+
+Error: Fallo LoRa
+Síntomas:
+
+Mensaje "❌ Error iniciando LoRa!"
+
+No se envían datos por radio
+
+Solución:
+
+Revisar conexiones SPI (SCK, MISO, MOSI, CS)
+
+Confirmar configuración de pines LoRa
+
+Verificar antena conectada
+
+Probar con otro módulo LoRa
+
+Error: Ciclo No Avanza
+Solución:
+
+Revisar constantes de tiempo en el código
+
+Verificar que millis() no se resetea
+
+Monitorizar variables de estado del ciclo
+
+🔧 Desarrollo
+Estructura del Proyecto
+
+endpoint_rs485_lora/
+├── src/
+│   └── main.cpp                 # Código principal
+├── lib/                         # Librerías adicionales
+├── include/                     # Archivos de cabecera
+├── test/                        # Pruebas unitarias
+├── platformio.ini              # Configuración PlatformIO
+└── README.md                   # Este archivo
+
+Personalización
+// 🔧 CONFIGURACIÓN MODIFICABLE
+#define ENDPOINT_ID "EP01"              // Identificador único
+#define CICLO_COMPLETO 120000           // Duración ciclo (ms)
+#define DESCUBRIMIENTO 10000            // Tiempo discovery (ms)
+#define LECTURA_SENSORES 30000          // Tiempo lectura (ms)
+#define ENVIO_LORA 15000                // Tiempo transmisión (ms)
+
+Próximas Mejoras
+🔋 Modo bajo consumo entre ciclos
+
+📊 Métricas de calidad de señal
+
+🔄 Actualización de firmware OTA
+
+⚙️ Configuración remota de parámetros
+
+👥 Contribución
+Fork el proyecto
+
+Crear feature branch (git checkout -b feature/nuevaFuncionalidad)
+
+Commit cambios (git commit -am 'Add nueva funcionalidad')
+
+Push al branch (git push origin feature/nuevaFuncionalidad)
+
+Abrir Pull Request
+
+📞 Soporte
+📋 Issues: GitHub Issues
+
+📧 Email: equipo.telecomunicaciones@instituto.edu
+
+💬 Discord: Servidor del Proyecto
+
+📝 Licencia
+Distribuido bajo licencia MIT. Ver LICENSE para más información.
+
