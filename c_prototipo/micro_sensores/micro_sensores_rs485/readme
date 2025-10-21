@@ -1,207 +1,231 @@
-📡 Micro-sensores RS485 - ESP8266 + AHT10
-📋 Descripción del Proyecto
-Sistema de monitoreo de sensores ambientales usando ESP8266 como dispositivo esclavo RS485. Cada módulo lee temperatura y humedad del sensor AHT10 y responde a comandos via protocolo RS485 personalizado.
+# 🌡️ Micro-sensores RS485 - Sistema de Monitoreo
 
-🏗️ Arquitectura del Sistema
+<div align="center">
 
-[ESP8266 + AHT10] → (RS485) → [ESP32-C3 Endpoint] → (LoRa) → [Gateway] → (MQTT/WebSockets) → [Backend]
+![ESP8266](https://img.shields.io/badge/ESP8266-NodeMCU-red?style=for-the-badge)
+![RS485](https://img.shields.io/badge/Protocolo-RS485-blue?style=for-the-badge)
+![PlatformIO](https://img.shields.io/badge/PlatformIO-IDE-orange?style=for-the-badge)
 
-⚙️ Configuración Técnica
-📌 Hardware Requerido
-Microcontrolador: ESP8266 (NodeMCU v2)
+**Sistema distribuido de monitoreo ambiental para silos agrícolas**
 
-Sensor: AHT10 (Temperatura y Humedad)
+</div>
 
-Comunicación: Módulo MAX485 para RS485
+## 📋 Tabla de Contenidos
+- [Descripción](#-descripción)
+- [Arquitectura](#🏗️-arquitectura)
+- [Instalación](#🚀-instalación)
+- [Configuración](#⚙️-configuración)
+- [Protocolo](#📡-protocolo-de-comunicación)
+- [Uso](#🎯-uso)
+- [Troubleshooting](#🐛-solución-de-problemas)
 
-Alimentación: 3.3V
+## 🎯 Descripción
 
-🔌 Diagrama de Conexiones
-AHT10 (Sensor)
-Pin AHT10	Pin ESP8266
-VCC	3.3V
-GND	GND
-SDA	GPIO4 (D2)
-SCL	GPIO5 (D1)
-MAX485 (RS485)
-Pin MAX485	Pin ESP8266
-RO	GPIO13 (D7)
-DI	GPIO12 (D6)
-DE/RE	GPIO14 (D5)
-VCC	3.3V
-GND	GND
-🚀 Instalación y Configuración
-1. Requisitos Previos
-PlatformIO IDE (VS Code)
+Sistema de monitoreo en tiempo real que utiliza **ESP8266 como nodos sensores** distribuidos, comunicándose via **RS485** con un concentrador central. Diseñado específicamente para entornos agrícolas con múltiples silos.
 
-Librería Adafruit AHTX0
+### Características Principales
+- ✅ Monitoreo simultáneo de **temperatura y humedad**
+- ✅ Comunicación **RS485 de largo alcance** (hasta 1200m)
+- ✅ Protocolo **robusto con checksum CRC**
+- ✅ **Auto-descubrimiento** de dispositivos
+- ✅ Configuración individual por **dirección única**
 
+## 🏗️ Arquitectura
 
-2. Configuración PlatformIO
+```mermaid
+graph TB
+    A[Sensor AHT10] --> B[ESP8266]
+    B --> C[RS485 Bus]
+    C --> D[ESP32-C3 Endpoint]
+    D --> E[LoRa Gateway]
+    E --> F[Backend Cloud]
+    
+    subgraph "Nodos Sensores"
+    B
+    end
+    
+    style B fill:#e1f5fe
+    style D fill:#f3e5f5
+    style E fill:#e8f5e8
 
+    🚀 Instalación Rápida
+Prerrequisitos
+PlatformIO IDE (extensión VS Code)
+
+ESP8266 NodeMCU o compatible
+
+Sensor AHT10
+
+Módulo MAX485
+
+1. Clonar Repositorio
+bash
+git clone https://github.com/tuusuario/micro-sensores-rs485.git
+cd micro-sensores-rs485
+2. Configurar PlatformIO
+El archivo platformio.ini ya está configurado:
+
+ini
 [env:nodemcuv2]
 platform = espressif8266
 board = nodemcuv2
 framework = arduino
 monitor_speed = 115200
-upload_speed = 921600
 
-lib_deps =
-    adafruit/Adafruit AHTX0
+lib_deps = adafruit/Adafruit AHTX0
+3. Configurar Dispositivo
+Editar src/main.cpp:
 
-build_flags =
-    -Wl,-Teagle.flash.4m3m.ld
-    -D PIO_FRAMEWORK_ARDUINO_MMU_CACHE16_IRAM48_SECHEAP_SHARED
-
-
-    3. Configuración del Dispositivo
-
-    // 🔧 CONFIGURAR POR CADA DISPOSITIVO
-#define MY_ADDRESS 0x01              // Dirección única (1-32)
-#define DEVICE_TYPE "AHT10_SENSOR"   // Tipo de dispositivo  
+cpp
+// 🔧 CONFIGURACIÓN INDIVIDUAL POR DISPOSITIVO
+#define MY_ADDRESS 0x01              // Dirección única 1-32
+#define DEVICE_TYPE "AHT10_SENSOR"   
 #define DEVICE_LOCATION "Silo_Norte" // Ubicación física
-
-
-// 🔧 CONFIGURAR POR CADA DISPOSITIVO
-#define MY_ADDRESS 0x01              // Dirección única (1-32)
-#define DEVICE_TYPE "AHT10_SENSOR"   // Tipo de dispositivo  
-#define DEVICE_LOCATION "Silo_Norte" // Ubicación física
-
-ADDR:[DIRECCIÓN]|CMD:[COMANDO]|[DATOS]|CRC:[CHECKSUM]
-
-Comandos Disponibles
-🎯 DISCOVERY - Identificación
+4. Compilar y Subir
+bash
+pio run -t upload
+🔌 Diagrama de Conexiones
+Conexiones AHT10
+Sensor	ESP8266	Color Recomendado
+VCC	3.3V	Rojo
+GND	GND	Negro
+SDA	GPIO4	Azul
+SCL	GPIO5	Verde
+Conexiones MAX485 (RS485)
+Módulo	ESP8266	Función
+RO	GPIO13	Recepción
+DI	GPIO12	Transmisión
+DE/RE	GPIO14	Control
+VCC	3.3V	Alimentación
+GND	GND	Tierra
+📡 Protocolo de Comunicación
+Estructura de Mensajes
+text
+ADDR:[DIRECCIÓN]|CMD:[COMANDO]|[PARÁMETROS]|CRC:[CHECKSUM]
+Comandos Implementados
+🔍 DISCOVERY - Identificación
 Request:
+
+plaintext
 ADDR:BROADCAST|CMD:DISCOVERY|CRC:XXXX
-
 Response:
-ADDR:01|CMD:DISCOVERY_RESP|TYPE:AHT10_SENSOR|LOC:Silo_Norte|STATUS:READY|TEMP:25.5|HUM:60.2|CRC:ABCD
 
+plaintext
+ADDR:01|CMD:DISCOVERY_RESP|TYPE:AHT10_SENSOR|LOC:Silo_Norte|STATUS:READY|TEMP:25.5|HUM:60.2|CRC:ABCD
 🌡️ READ_SENSOR - Lectura
 Request:
+
+plaintext
 ADDR:01|CMD:READ_SENSOR|CRC:XXXX
-
 Response:
+
+plaintext
 ADDR:01|CMD:SENSOR_DATA|TEMP:25.5|HUM:60.2|UNIT_TEMP:C|UNIT_HUM:%|TIMESTAMP:123456789|CRC:ABCD
+🎯 Uso del Sistema
+Monitoreo en Tiempo Real
+bash
+pio device monitor
+Salida Esperada:
 
-📊 STATUS - Estado
-Request:
-ADDR:01|CMD:STATUS|CRC:XXXX
+plaintext
+🚀 MICRO-SENSOR RS485 - INICIANDO
+📍 Dirección: 1 | 📍 Ubicación: Silo_Norte
+✅ SENSOR AHT10 INICIALIZADO
+📤 RS485 >>> ADDR:01|CMD:HEARTBEAT|STATUS:READY|UPTIME:30s
+📊 Sensor - Temp: 25.5°C, Hum: 60.2%
+Comandos de Prueba
+Para probar manualmente, enviar por monitor serial:
 
-Response:
-ADDR:01|CMD:STATUS_RESP|SENSOR_ACTIVE:YES|LAST_READ:123456|UPTIME:3600s|RSSI:-45dBm|CRC:ABCD
+plaintext
+TEST:DISCOVERY
+TEST:READ_SENSOR
+⚙️ Configuración Avanzada
+Intervalos de Tiempo
+cpp
+#define HEARTBEAT_INTERVAL 30000    // 30 segundos
+#define SENSOR_READ_INTERVAL 5000   // 5 segundos (debug)
+Estados del Sistema
+BOOTING: Inicialización
 
-⚙️ CONFIG - Configuración
-Request:
-ADDR:01|CMD:CONFIG|PARAM:VALUE|CRC:XXXX
+READY: Operativo
 
-Response:
-ADDR:01|CMD:CONFIG_ACK|STATUS:OK|CRC:ABCD
+SENSOR_ERROR: Fallo de sensor
 
-🔄 Comportamiento del Sistema
-Ciclo de Operación
-Inicialización: Verifica sensor y configura RS485
-
-Escucha Continua: Espera comandos del maestro RS485
-
-Heartbeat Automático: Envía estado cada 30 segundos
-
-Lectura Local: Monitorea sensor cada 5 segundos (solo para debug)
-
-Estados del Dispositivo
-BOOTING: Inicialización del sistema
-
-READY: Sensor activo y funcionando
-
-SENSOR_ERROR: Fallo en la lectura del sensor
-
-COMM_ERROR: Problemas de comunicación
-
-🛠️ Funciones Principales
-procesarComando(String comando)
-Analiza y ejecuta comandos recibidos
-
-Valida dirección del dispositivo
-
-Genera respuestas estructuradas
-
-enviarRS485(String mensaje)
-Controla pines DE/RE del MAX485
-
-Agrega checksum CRC automáticamente
-
-Maneja temporización de transmisión
-
-leerSensor()
-Lee temperatura y humedad del AHT10
-
-Maneja errores de comunicación I2C
-
-Actualiza variables globales
+COMM_ERROR: Error comunicación
 
 🐛 Solución de Problemas
-Error de Compilación
-Si hay errores con la librería AHTX0, usar:
+Error Común: Sensor No Detectado
+Síntoma: Mensaje "❌ FALLO" en inicialización
 
-lib_deps = adafruit/Adafruit AHTX0 @ ^1.1.2
+Solución:
 
-Sensor No Detectado
 Verificar conexiones I2C (SDA/SCL)
 
-Confirmar alimentación 3.3V
+Confirmar alimentación 3.3V estable
 
-Revisar direcciones I2C con scanner
+Usar scanner I2C para detectar direcciones
 
-Comunicación RS485
-Verificar pines RO/DI/DE-RE
+Error Común: Sin Comunicación RS485
+Solución:
+
+Revisar pines RO/DI/DE-RE
 
 Confirmar velocidad 9600 bauds
 
-Revisar terminación de bus y tierra
+Verificar terminación de bus
 
-📊 Monitoreo y Debug
-Salida Serial
-El dispositivo envía información detallada por Serial (115200 bauds):
+Logs de Depuración
+Habilitar logs detallados modificando:
 
-Estado de inicialización
+cpp
+Serial.println("🔍 [DEBUG] " + mensaje);
+📊 Estructura del Proyecto
+text
+micro_sensores_rs485/
+├── src/
+│   └── main.cpp              # Código principal
+├── lib/                      # Librerías adicionales
+├── test/                     # Pruebas unitarias
+├── platformio.ini           # Configuración PlatformIO
+└── README.md               # Este archivo
+🔄 Flujo de Datos
+Inicialización → Verifica hardware y configura RS485
 
-Comandos recibidos/enviados
+Escucha → Espera comandos del maestro RS485
 
-Lecturas de sensores
+Procesamiento → Ejecuta comandos y genera respuestas
 
-Heartbeats automáticos
+Transmisión → Envía datos con control DE/RE
 
-LEDs de Estado (Opcional)
-Se pueden agregar LEDs para indicar:
+Monitoreo → Heartbeats automáticos y lecturas locales
 
-Verde: Sensor activo
+👥 Desarrollo
+Próximas Mejoras
+Configuración remota de parámetros
 
-Amarillo: Transmisión RS485
+Métricas de calidad de señal
 
-Rojo: Error/Reconexión
+Modo bajo consumo
 
-🔄 Próximos Pasos
-Implementar Endpoint ESP32-C3 (Maestro RS485)
+Actualización OTA
 
-Configurar comunicación LoRa al Gateway
+Contribuir
+Fork el proyecto
 
-Desarrollar protocolo MQTT/WebSockets para backend
+Crear feature branch (git checkout -b feature/nuevaFuncionalidad)
 
-Implementar sistema de configuración remota
+Commit cambios (git commit -am 'Add nueva funcionalidad')
 
-📝 Notas Importantes
-Cada dispositivo debe tener dirección única (0x01-0x20)
+Push branch (git push origin feature/nuevaFuncionalidad)
 
-El bus RS485 requiere terminación en ambos extremos
+Abrir Pull Request
 
-Considerar distancia máxima del bus RS485 (1200m teóricos)
+📝 Licencia
+Distribuido bajo licencia MIT. Ver LICENSE para más información.
 
-Implementar timeout en comunicaciones para robustez
+📞 Soporte
+Issues: GitHub Issues
 
-👥 Contribución
-Este proyecto es parte del sistema de monitoreo de silos desarrollado para la Tecnicatura en Telecomunicaciones.
-
-🔄 Estado del Proyecto: ✅ Compilado y Funcional
-
+Email: equipo.telecomunicaciones@instituto.edu
 
 
