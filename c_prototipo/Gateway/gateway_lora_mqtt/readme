@@ -1,0 +1,301 @@
+🚀 Gateway MQTT/WebSockets ESP32
+Un gateway IoT inteligente basado en ESP32 que establece conexión MQTT sobre WebSockets para comunicación bidireccional con sistemas backend.
+
+📋 Tabla de Contenidos
+Características
+
+Arquitectura
+
+Instalación
+
+Configuración
+
+Uso
+
+Mensajes MQTT
+
+Estados del Sistema
+
+API
+
+Troubleshooting
+
+Contribución
+
+✨ Características
+Conectividad
+✅ MQTT sobre WebSockets (Puerto 8083)
+
+✅ Dual-mode WiFi (STA + AP)
+
+✅ Reconexión automática inteligente
+
+✅ Configuración persistente en flash
+
+✅ Brokers compatibles: EMQX, HiveMQ, Mosquitto
+
+Confiabilidad
+🔄 Máquina de estados robusta
+
+💾 Almacenamiento persistente de configuración
+
+📊 Monitoreo de salud del sistema
+
+🚨 Manejo de errores avanzado
+
+⏰ Timeouts configurables
+
+Interfaz
+📟 Feedback visual en LCD
+
+📱 Modo AP para configuración web
+
+📊 Logs detallados con emojis
+
+🔍 Diagnóstico en tiempo real
+
+🏗️ Arquitectura
+Diagrama de Flujo
+text
+[ESP32 Gateway] 
+    → [WiFi Connection] 
+    → [WebSocket Client] 
+    → [MQTT over WS] 
+    → [Cloud Broker]
+Componentes Principales
+Componente	Función
+MQTTManual	Implementación MQTT sobre WebSockets
+WebSocketsClient	Cliente WebSocket para ESP32
+Preferences	Almacenamiento persistente
+WiFi	Gestión de conexiones de red
+LCD	Interfaz visual de usuario
+🔧 Instalación
+Prerrequisitos
+PlatformIO (recomendado) o Arduino IDE
+
+ESP32 Dev Board
+
+LCD I2C (opcional)
+
+Conexión WiFi disponible
+
+Dependencias
+ini
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+monitor_speed = 115200
+lib_deps = 
+    links2004/WebSockets @ ^2.3.6
+    bblanchon/ArduinoJson @ ^6.21.3
+Instalación Paso a Paso
+Clonar el repositorio
+
+
+git clone https://github.com/tu-usuario/esp32-mqtt-gateway.git
+cd esp32-mqtt-gateway
+Abrir en PlatformIO
+
+
+Compilar y subir
+
+pio run -t upload
+Monitor serial
+
+pio device monitor
+
+⚙️ Configuración
+Configuración Inicial
+Primer inicio: El gateway crea un AP "ESP32-Gateway"
+
+Conectar: Conectarse al AP desde cualquier dispositivo
+
+Configurar: Acceder al portal web de configuración
+
+Guardar: Ingresar credenciales WiFi y servidor MQTT
+
+Configuración por Defecto
+// Broker MQTT
+String mqttServer = "broker.emqx.io";
+int mqttPort = 8083;
+
+// WiFi AP
+const char* AP_SSID = "ESP32-Gateway";
+const char* AP_PASSWORD = "";
+
+// Tiempos
+const unsigned long RECONNECT_INTERVAL = 10000;    // 10s
+const unsigned long STATUS_INTERVAL = 30000;       // 30s
+const unsigned long HEARTBEAT_INTERVAL = 25000;    // 25s
+
+🚀 Uso
+Flujo de Operación Normal
+text
+1. POWER ON → Cargar configuración
+2. ¿WiFi configurado? → Sí: Conectar WiFi
+3. Conectar WebSocket → broker:8083/mqtt
+4. Autenticar MQTT → Enviar CONNECT
+5. Sistema operativo → Publicar datos
+Comandos por Serial
+Comando	Función
+reset	Reinicia el gateway
+status	Muestra estado actual
+config	Muestra configuración
+
+📨 Mensajes MQTT
+Topics de Publicación
+Estado del Gateway
+Topic: gateway/estado
+
+{
+  "id": "ESP32-Gateway",
+  "ip": "192.168.1.100",
+  "rssi": -65,
+  "reconexiones": 2,
+  "heapLibre": 195232,
+  "estado": "OPERATIVO"
+}
+Datos de Sensores
+Topic: sensores/{tipo_sensor}/datos
+
+{
+  "sensor": "DHT22",
+  "temperatura": 23.5,
+  "humedad": 65.2,
+  "timestamp": 1234567890
+}
+Heartbeat
+Topic: gateway/heartbeat (implícito)
+
+{
+  "clientId": "ESP32-Gateway",
+  "timestamp": 1234567890
+}
+Topics de Suscripción
+Comandos de Control
+Topic: gateway/control
+
+"reset"  // Reinicia el gateway
+Datos de Sensores
+Topic: sensors/+/data
+
++ actúa como comodín para cualquier sensor
+
+📊 Estados del Sistema
+Secuencia de Estados
+
+ESTADO_AP → ESTADO_CONECTANDO_WIFI → ESTADO_CONECTANDO_WS 
+→ ESTADO_CONECTANDO_MQTT → ESTADO_OPERATIVO
+Descripción de Estados
+Estado	Descripción	LCD Display
+ESTADO_AP	Modo configuración	MODO CONFIGURACIÓN
+ESTADO_CONECTANDO_WIFI	Conectando a WiFi	CONECTANDO WIFI
+ESTADO_CONECTANDO_WS	Conectando WebSocket	CONECTANDO WS
+ESTADO_CONECTANDO_MQTT	Autenticando MQTT	CONECTANDO MQTT
+ESTADO_OPERATIVO	Sistema listo	SISTEMA OPERATIVO
+ESTADO_RECONECTANDO	Recuperando conexión	RECONECTANDO...
+
+🔌 API
+Funciones Principales
+Gestión de Conexiones
+
+void conectarWiFi();          // Conectar a WiFi
+void conectarWebSocket();     // Conectar WebSocket
+void manejarReconexion();     // Reconexión automática
+Publicación de Datos
+
+void publicarEstado();        // Estado del gateway
+void publicarDatosSensor();   // Datos de sensores
+void publicarHeartbeat();     // Heartbeat MQTT
+Configuración
+
+void cargarConfigWiFi();      // Cargar configuración
+void guardarConfigWiFi();     // Guardar configuración
+void iniciarAP();             // Modo punto de acceso
+🐛 Troubleshooting
+Problemas Comunes
+No conecta a WiFi
+Síntoma: Permanece en ESTADO_CONECTANDO_WIFI
+Solución:
+
+Verificar SSID y password
+
+Revisar señal WiFi
+
+Reiniciar configuración
+
+No conecta a MQTT
+Síntoma: Permanece en ESTADO_CONECTANDO_MQTT
+Solución:
+
+Verificar broker y puerto
+
+Revisar firewall
+
+Probar con broker público
+
+Memory Leaks
+Síntoma: Heap libre disminuye
+Solución:
+
+Monitorear heapLibre en estado
+
+Optimizar buffers
+
+Reiniciar periódicamente
+
+Logs de Diagnóstico
+Los logs usan emojis para fácil identificación:
+
+Emoji	Significado
+✅	Operación exitosa
+❌	Error crítico
+🔄	Reconexión
+📤	Publicación
+📥	Recepción
+💓	Heartbeat
+🤝 Contribución
+¡Las contribuciones son bienvenidas!
+
+Cómo Contribuir
+Fork el proyecto
+
+Crear una rama (git checkout -b feature/nueva-funcionalidad)
+
+Commit los cambios (git commit -m 'Agregar nueva funcionalidad')
+
+Push a la rama (git push origin feature/nueva-funcionalidad)
+
+Abrir un Pull Request
+
+Estándares de Código
+Documentación en español
+
+Comentarios claros y concisos
+
+Logs con emojis para mejor legibilidad
+
+Manejo de errores robusto
+
+📄 Licencia
+Este proyecto está bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
+
+📞 Soporte
+Issues: GitHub Issues
+
+Email: soporte@tudominio.com
+
+Documentación: Wiki del proyecto
+
+🎯 Próximas Características
+Autenticación MQTT con usuario/password
+
+Soporte para LoRaWAN
+
+OTA (Over-The-Air) updates
+
+Dashboard web integrado
+
+Múltiples brokers simultáneos
+
