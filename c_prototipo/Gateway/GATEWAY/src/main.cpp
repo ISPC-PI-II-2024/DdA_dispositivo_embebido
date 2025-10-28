@@ -1,165 +1,185 @@
+// main.cpp
 #include <Arduino.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-#include <SPI.h>
-#include <LoRa.h>
+#include "conexiones.h"
+#include "lcdplus.h"
+#include "web_portal.h"
+#include "lora_manager.h"
 
-LiquidCrystal_I2C lcd(0x27, 20, 4);  // ← AJUSTAR SEGÚN ESCÁNER
+unsigned long apStartTime = 0;
+const unsigned long apDuration = 180000; // 3 min
+unsigned long lastPublishGateway = 0;
+unsigned long lastPublishEndpoints = 0;
+unsigned long lastPublishSensors = 0;
+const unsigned long publishIntervalGateway = 30000; // 30s - Estado gateway
+const unsigned long publishIntervalEndpoints = 60000; // 60s - Estado endpoints
+const unsigned long publishIntervalSensors = 60000; // 60s - Datos sensores
+unsigned long lastLCD = 0;
+const unsigned long lcdInterval = 2000; // 2s
+unsigned long lastLoraUpdate = 0;
+const unsigned long loraUpdateInterval = 45000; // 45s - Polling endpoints
 
-#define LORA_SCK 18
-#define LORA_MISO 19
-#define LORA_MOSI 23
-#define LORA_CS 5
-#define LORA_RST 26
-#define LORA_DIO0 27
-#define LORA_FREQ 433E6
+void mqttLoop();
 
-unsigned long contactosTotales = 0;
-unsigned long tiempoPantallaMensaje = 0;
-bool mostrarMensajeTemporal = false;
-
-// Función para clasificar la calidad del SNR
-String calidadSenal(float snr) {
-  if (snr > 10.0) return "Excelente";
-  else if (snr >= 0.0) return "Buena    "; // Espacios para limpiar
-  else return "Debil    ";
-}
-
-bool iniciar_Lora()
-{
-  SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-  LoRa.setPins(LORA_CS, LORA_RST, LORA_DIO0);
-  if (!LoRa.begin(LORA_FREQ)) return false;
-
-  LoRa.setSpreadingFactor(7);
-  LoRa.setSignalBandwidth(125E3);
-  LoRa.setCodingRate4(5);
-  LoRa.setSyncWord(0x12);
-  LoRa.enableCrc();
-  return true;
-}
-
-String extraerID(const String& msg)
-{
-  int pos = msg.indexOf("ENDPOINT - ");
-  if (pos == -1) return "";
-  return msg.substring(pos + 11);
-}
-
-void setup()
-{
-  Serial.begin(9600);
-  lcd.init();
-  lcd.backlight();
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Iniciando LoRa...");
-
-  if (!iniciar_Lora()) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Error LoRa");
-    while (1) delay(1000);
+void setup() {
+  Serial.begin(115200);
+  delay(500);
+  Serial.println("\n=== Gateway MQTT ESP32 ===\n");
+  
+  // Inicializar LCD y mostrar splash
+  initLCD();
+  lcdMode = LCDMode::NORMAL; 
+  mostrarMensajeLCD("Gateway MQTT", "Iniciando...", 2000);
+  delay(2000);
+  
+  // Inicializar LoRa
+  mostrarMensajeLCD("LoRa:", "Iniciando...", 0);
+  if (initLora()) {
+    mostrarMensajeLCD("LoRa: OK", "433 MHz", 2000);
+  } else {
+    mostrarMensajeLCD("LoRa: ERROR", "Sin modulo", 3000);
   }
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("LoRa OK");
-  lcd.setCursor(0, 1);
-  lcd.print("Esperando datos...");
-  delay(1500);
+  delay(2000);
+  
+  initWiFi();
+  
+  if (wifiConfigured) {
+    // WiFi configurado - intentar conectar
+    apMode = false;
+    mostrarMensajeLCD("WiFi Config: SI", "Conectando...", 0);
+    
+    conectarWifi();
+    
+    // Esperar conexión WiFi con feedback
+    Serial.print("Conectando WiFi");
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 30) {
+      delay(500);
+      Serial.print(".");
+      
+      // Actualizar LCD cada 5 intentos
+      if (attempts % 5 == 0) {
+        String dots = "";
+        for(int i = 0; i < (attempts/5) % 4; i++) dots += ".";
+        mostrarMensajeLCD("Conectando WiFi", dots, 0);
+      }
+      attempts++;
+    }
+    Serial.println();
+    
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.println("✅ WiFi conectado!");
+      Serial.print("IP: ");
+      Serial.println(WiFi.localIP());
+      
+      mostrarMensajeLCD("WiFi: OK", "Init MQTT...", 2000);
+      delay(2000);
+      
+      // Inicializar MQTT/WebSocket
+      initMQTT();
+      
+      // Esperar WebSocket
+      Serial.println("Esperando WebSocket...");
+      mostrarMensajeLCD("MQTT: Esperando", "Conexion...", 2000);
+      delay(2000);
+      
+      // Volver a modo normal
+      volverModoNormal();
+      
+    } else {
+      Serial.println("❌ WiFi falló");
+      mostrarMensajeLCD("WiFi: ERROR", "Sin conexion", 3000);
+      delay(3000);
+    }
+  } else {
+    // Sin configuración - iniciar AP
+    mostrarMensajeLCD("WiFi Config: NO", "Iniciando AP...", 2000);
+    delay(2000);
+    
+    iniciarAP();
+    setupWebServer();
+    apStartTime = millis();
+    
+    volverModoNormal();
+  }
 }
 
-void loop()
-{
-  int packetSize = LoRa.parsePacket();
-  if (packetSize > 0)
-  {
-    int rssi = LoRa.packetRssi();
-    float snr = LoRa.packetSnr();
-
-    String mensaje = "";
-    while (LoRa.available()) {
-      mensaje += (char)LoRa.read();
+void loop() {
+  // Verificar botón de reset (SIEMPRE)
+  checkResetButton();
+  
+  // Loop LoRa pasivo (escuchar mensajes no solicitados)
+  loraLoop();
+  
+  if (apMode) {
+    handleWebRequests();
+    
+    // Timeout del AP
+    if (millis() - apStartTime >= apDuration) {
+      WiFi.softAPdisconnect(true);
+      apMode = false;
+      if (!wifiConfigured) {
+        mostrarMensajeLCD("AP Timeout", "Sin config WiFi", 0);
+      }
     }
-    mensaje.trim();
-
-    Serial.println("Recibido: " + mensaje);
-    Serial.print("RSSI: "); Serial.print(rssi); Serial.print(" dBm | ");
-    Serial.print("SNR: "); Serial.print(snr, 1); Serial.println(" dB");
-
-    String id = extraerID(mensaje);
-    if (id.length() > 0)
-    {
-      contactosTotales++;
-
-      // Enviar ACK
-      String ack = "ACK:" + id;
-      LoRa.beginPacket();
-      LoRa.print(ack);
-      LoRa.endPacket();
-
-      // Mostrar en LCD con 4 líneas
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("ID:" + id + " C:" + String(contactosTotales));
-
-      lcd.setCursor(0, 1);
-      lcd.print("RSSI:");
-      lcd.print(rssi);
-      lcd.print("dBm");
-
-      lcd.setCursor(0, 2);
-      lcd.print("SNR: ");
-      lcd.print(snr, 1); // 1 decimal
-      lcd.print("dB");
-
-      lcd.setCursor(0, 3);
-      lcd.print("Calidad: ");
-      lcd.print(calidadSenal(snr));
-
-      mostrarMensajeTemporal = true;
-      tiempoPantallaMensaje = millis();
-    }
-    else
-    {
-      // Mensaje no reconocido, pero igual mostramos señal
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Msg invalido");
-      lcd.setCursor(0, 1);
-      lcd.print("RSSI:");
-      lcd.print(rssi);
-      lcd.print("dBm");
-      lcd.setCursor(0, 2);
-      lcd.print("SNR: ");
-      lcd.print(snr, 1);
-      lcd.print("dB");
-      lcd.setCursor(0, 3);
-      lcd.print("Calidad: ");
-      lcd.print(calidadSenal(snr));
-
-      mostrarMensajeTemporal = true;
-      tiempoPantallaMensaje = millis();
+  } else {
+    handleWiFiReconnect();
+    
+    if (WiFi.status() == WL_CONNECTED) {
+      // Loop de WebSocket
+      webSocket.loop();
+      
+      // Loop MQTT (ping)
+      mqttLoop();
+      
+      // Actualizar endpoints vía LoRa (polling)
+      if (millis() - lastLoraUpdate >= loraUpdateInterval) {
+        if (loraInicializado) {
+          actualizarTodosEndpoints();
+        }
+        lastLoraUpdate = millis();
+      }
+      
+      // Publicar datos solo si MQTT está conectado
+      if (mqttClient && mqttClient->connected()) {
+        
+        // Tópico 1: gateway/gateway (estado del gateway)
+        if (millis() - lastPublishGateway >= publishIntervalGateway) {
+          String json = getGatewayStatusJSON();
+          String topic = "gateway/gateway";
+          mqttClient->publish(topic.c_str(), json.c_str());
+          Serial.println("📤 [gateway/gateway] " + json);
+          lastPublishGateway = millis();
+        }
+        
+        // Tópico 2: gateway/endpoint (estado de endpoints)
+        if (millis() - lastPublishEndpoints >= publishIntervalEndpoints) {
+          String json = getEndpointsStatusJSON();
+          String topic = "gateway/endpoint";
+          mqttClient->publish(topic.c_str(), json.c_str());
+          Serial.println("📤 [gateway/endpoint] " + json);
+          lastPublishEndpoints = millis();
+        }
+        
+        // Tópico 3: gateway/sensor (datos de sensores)
+        if (millis() - lastPublishSensors >= publishIntervalSensors) {
+          String json = getSensorsDataJSON();
+          String topic = "gateway/sensor";
+          mqttClient->publish(topic.c_str(), json.c_str());
+          Serial.println("📤 [gateway/sensor] " + json);
+          lastPublishSensors = millis();
+        }
+      }
+      
+      // Limpiar endpoints inactivos
+      limpiarEndpointsInactivos();
     }
   }
-
-  // Volver a pantalla de espera después de 3 segundos
-  unsigned long ahora = millis();
-  if (mostrarMensajeTemporal && (ahora - tiempoPantallaMensaje >= 3000))
-  {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Gateway LoRa Activo");
-    lcd.setCursor(0, 1);
-    lcd.print("Esperando endpoint...");
-    lcd.setCursor(0, 2);
-    lcd.print("Contactos: ");
-    lcd.print(contactosTotales);
-    lcd.setCursor(0, 3);
-    lcd.print("433 MHz | SF7");
-    mostrarMensajeTemporal = false;
+  
+  // Actualizar LCD periódicamente (solo si está en modo NORMAL)
+  if (millis() - lastLCD >= lcdInterval) {
+    actualizarLCD();
+    lastLCD = millis();
   }
-
+  
   delay(10);
 }
