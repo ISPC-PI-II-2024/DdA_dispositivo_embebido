@@ -480,52 +480,52 @@ Datos de sensores (cada 60s)
 Este proyecto sirve como prueba de concepto IoT multinivel con:
 
 ### Conectividad
-- ✅ Portal cautivo de configuración WiFi
-- ✅ Persistencia de credenciales (NVS/Preferences)
-- ✅ Reconexión automática WiFi
-- ✅ Cliente MQTT manual sobre WebSocket
-- ✅ Publicación periódica de mensajes MQTT (3 tópicos)
-- ✅ Suscripción y recepción de mensajes MQTT
-- ✅ Keepalive MQTT (PING/PONG)
-- ✅ Timeout de Access Point (3 minutos)
+- [x] Portal cautivo de configuración WiFi
+- [x] Persistencia de credenciales (NVS/Preferences)
+- [x]  Reconexión automática WiFi
+- [x] Cliente MQTT manual sobre WebSocket
+- [x]  Publicación periódica de mensajes MQTT (3 tópicos)
+- [x] Suscripción y recepción de mensajes MQTT
+- [x] Keepalive MQTT (PING/PONG)
+- [x] Timeout de Access Point (3 minutos)
 
 ### LoRa
-- ✅ Comunicación bidireccional LoRa 433MHz
-- ✅ Sistema de polling de endpoints
-- ✅ Comando/respuesta con timeout
-- ✅ Verificación de integridad CRC
-- ✅ Medición de RSSI y SNR
-- ✅ Reconexión automática LoRa
+- [x] Comunicación bidireccional LoRa 433MHz
+- [x] Sistema de polling de endpoints
+- [x] Comando/respuesta con timeout
+- [ ] Verificación de integridad CRC
+- [ ] Medición de RSSI y SNR
+- [ ] Reconexión automática LoRa
 
 ### RS485
-- ✅ Comunicación half-duplex RS485
-- ✅ Protocolo master/slave
-- ✅ Control DE/RE del transceiver MAX485
-- ✅ Detección de timeout
-- ✅ Múltiples slaves en bus
+- [ ] Comunicación half-duplex RS485
+- [ ] Protocolo master/slave
+- [ ] Control DE/RE del transceiver MAX485
+- [ ] Detección de timeout
+- [ ] Múltiples slaves en bus
 
 ### Sensores
-- ✅ Lectura I2C de sensores AHT10
-- ✅ Validación de rangos de temperatura/humedad
-- ✅ Manejo de errores de comunicación
-- ✅ Identificación única de sensores
+- [ ] Lectura I2C de sensores AHT10
+- [ ] Validación de rangos de temperatura/humedad
+- [ ] Manejo de errores de comunicación
+- [ ] Identificación única de sensores
 
 ### Interfaz
-- ✅ Display LCD 20x4 con sistema anti-parpadeo
-- ✅ Manejo de estados temporales en LCD
-- ✅ Reset físico con botón y feedback visual
-- ✅ Barra de progreso en LCD
-- ✅ Indicadores LED de estado
+- [x] Display LCD 20x4 con sistema anti-parpadeo
+- [x] Manejo de estados temporales en LCD
+- [x] Reset físico con botón y feedback visual
+- [x] Barra de progreso en LCD
+- [x] Indicadores LED de estado
 
 ### Gestión de Energía
-- ✅ Medición de nivel de batería (ADC)
-- ✅ Detección de estado de carga
-- ✅ Publicación de estado energético
+- [ ] Medición de nivel de batería (ADC)
+- [ ] Detección de estado de carga
+- [ ] Publicación de estado energético
 
 ### Tiempo
-- ✅ Sincronización NTP con zona horaria Argentina
-- ✅ Cálculo de uptime del sistema
-- ✅ Timestamps en mensajes MQTT
+- [ ] Sincronización NTP con zona horaria Argentina
+- [ ] Cálculo de uptime del sistema
+- [x] Timestamps en mensajes MQTT
 
 ## 📁 Estructura del Proyecto
 
