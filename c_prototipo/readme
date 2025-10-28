@@ -490,37 +490,37 @@ Este proyecto sirve como prueba de concepto IoT multinivel con:
 - ✅ Timeout de Access Point (3 minutos)
 
 ### LoRa
-- [ ]  Comunicación bidireccional LoRa 433MHz
-- [ ]  Sistema de polling de endpoints
-- [ ]  Comando/respuesta con timeout
-- [ ]  Verificación de integridad CRC
-- [ ] Medición de RSSI y SNR
-- [ ]  Reconexión automática LoRa
+- ✅ Comunicación bidireccional LoRa 433MHz
+- ✅ Sistema de polling de endpoints
+- ✅ Comando/respuesta con timeout
+- ✅ Verificación de integridad CRC
+- ✅ Medición de RSSI y SNR
+- ✅ Reconexión automática LoRa
 
 ### RS485
-- [ ] Comunicación half-duplex RS485
-- [ ] Protocolo master/slave
-- [ ]  Control DE/RE del transceiver MAX485
-- [ ] Detección de timeout
-- [ ] Múltiples slaves en bus
+- ✅ Comunicación half-duplex RS485
+- ✅ Protocolo master/slave
+- ✅ Control DE/RE del transceiver MAX485
+- ✅ Detección de timeout
+- ✅ Múltiples slaves en bus
 
 ### Sensores
-- [ ] Lectura I2C de sensores AHT10
-- [ ] Validación de rangos de temperatura/humedad
-- [x] Manejo de errores de comunicación
-- [x] Identificación única de sensores
+- ✅ Lectura I2C de sensores AHT10
+- ✅ Validación de rangos de temperatura/humedad
+- ✅ Manejo de errores de comunicación
+- ✅ Identificación única de sensores
 
 ### Interfaz
-- [x] Display LCD 20x4 con sistema anti-parpadeo
-- [x] Manejo de estados temporales en LCD
-- [x] Reset físico con botón y feedback visual
-- [ ] Barra de progreso en LCD
-- [ ] Indicadores LED de estado
+- ✅ Display LCD 20x4 con sistema anti-parpadeo
+- ✅ Manejo de estados temporales en LCD
+- ✅ Reset físico con botón y feedback visual
+- ✅ Barra de progreso en LCD
+- ✅ Indicadores LED de estado
 
 ### Gestión de Energía
-- [ ] Medición de nivel de batería (ADC)
-- [ ] Detección de estado de carga
-- [ ] Publicación de estado energético
+- ✅ Medición de nivel de batería (ADC)
+- ✅ Detección de estado de carga
+- ✅ Publicación de estado energético
 
 ### Tiempo
 - ✅ Sincronización NTP con zona horaria Argentina
