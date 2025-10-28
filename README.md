@@ -63,9 +63,10 @@ Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribui
 ## 📊 Estado del proyecto
 
 - [x] Definición de arquitectura  
-- [ ] Programación de firmware  
+- [ ] Programación de firmware Gateway  ---80%
+- [ ] Programación de firmware Endpoint ---60%
 - [x] Comunicación LoRa entre nodos  
-- [ ] Visualización en pantalla  
+- [x] Visualización en pantalla  
 - [x] Transmisión MQTT al broker  
 - [ ] Validación en entorno de silo  
 
@@ -73,4 +74,4 @@ Este proyecto tiene como objetivo el desarrollo de un sistema embebido distribui
 
 ## 📎 Enlaces útiles
 - [Definir los enlaces a la informacion correcta (Solicitado por el profesor para mejor legibilidad)] (pendiente)
-- [Guía de contribución](CONTRIBUTING.md)
+
