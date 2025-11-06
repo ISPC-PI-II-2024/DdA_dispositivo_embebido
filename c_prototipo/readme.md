@@ -493,22 +493,22 @@ Este proyecto sirve como prueba de concepto IoT multinivel con:
 - [x] Comunicación bidireccional LoRa 433MHz
 - [x] Sistema de polling de endpoints
 - [x] Comando/respuesta con timeout
-- [ ] Verificación de integridad CRC
-- [ ] Medición de RSSI y SNR
-- [ ] Reconexión automática LoRa
+- [x] Verificación de integridad CRC
+- [x] Medición de RSSI y SNR
+- [x] Reconexión automática LoRa
 
 ### RS485
 - [ ] Comunicación half-duplex RS485
 - [ ] Protocolo master/slave
 - [ ] Control DE/RE del transceiver MAX485
-- [ ] Detección de timeout
-- [ ] Múltiples slaves en bus
+- [x] Detección de timeout
+- [x] Múltiples slaves en bus
 
 ### Sensores
-- [ ] Lectura I2C de sensores AHT10
-- [ ] Validación de rangos de temperatura/humedad
+- [x] Lectura I2C de sensores AHT10
+- [x] Validación de rangos de temperatura/humedad
 - [ ] Manejo de errores de comunicación
-- [ ] Identificación única de sensores
+- [x] Identificación única de sensores
 
 ### Interfaz
 - [x] Display LCD 20x4 con sistema anti-parpadeo
